@@ -10,6 +10,8 @@ import {
   ImageBackground
 } from 'react-native';
 
+import Enemy from './app/components/Enemy';
+
 export default class App extends Component {
 
   constructor(props) {
@@ -18,7 +20,14 @@ export default class App extends Component {
       movePlayerValue: new Animated.Value(60),
       playerSide: 'left',
       points: 0,
-    }
+
+      moveEnemyValue: new Animated.Value(0),
+      enemyStartPosX: 0,
+      enemySide: 'left',
+      enemySpeed: 4200,
+
+      gameOver: false,
+    };
   }
 
   render() {
@@ -43,6 +52,11 @@ export default class App extends Component {
             { translateX: this.state.movePlayerValue }
           ]
         }}></Animated.Image>
+
+        <Enemy enemyImg={require('./app/img/car_one.png')}
+        enemyStartPosX={this.state.enemyStartPosX}
+        moveEnemyValue={this.state.moveEnemyValue} />
+
 
         <View style={styles.controls}>
           <Text style={styles.left} onPress={ () => this.movePlayerValue('left') }> {'<'} </Text>
