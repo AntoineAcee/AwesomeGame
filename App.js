@@ -22,7 +22,7 @@ export default class App extends Component {
       points: 0,
 
       moveEnemyValue: new Animated.Value(0),
-      enemyStartPosX: 0,
+      enemyStartPosX: 60,
       enemySide: 'left',
       enemySpeed: 4200,
 
@@ -90,6 +90,62 @@ export default class App extends Component {
         }
       ).start();
     }
+  }
+
+  componentDidMount() {
+    this.animateEnemy();
+
+  }
+
+  animateEnemy() {
+    this.state.moveEnemyValue.setValue(-120);
+    var windowHeight = Dimensions.get('window').height;
+
+    var r = Math.floor(Math.random()*2) + 1;
+    if (r == 2) {
+      r = 40;
+      this.setState({ enemySide: 'left'});
+    } else {
+      r = Dimensions.get('window').width - 160;
+      this.setState({ enemySide: 'right' });
+    }
+    this.setState({ enemyStartPosX: r });
+
+    // Check Collision 50ms
+    var refreshIntervalId;
+    refreshIntervalId = setInterval( () => {
+      // Colision
+      if (this.state.moveEnemyValue._value > windowHeight - 280 
+        && this.state.moveEnemyValue._value < windowHeight - 180 
+        && this.state.playerSide == this.state.enemySide) {
+        clearInterval(refreshIntervalId);
+        this.setState({gameOver: true});
+        this.gameOver();
+      }
+    }, 50);
+
+    // Enemy speed
+    setInterval( () => {
+      this.setState({ enemySpeed: this.state.enemySpeed - 50})
+    }, 20000);
+
+    Animated.timing(
+      this.state.moveEnemyValue,
+      {
+        toValue: Dimensions.get('window').height,
+        duration: this.state.enemySpeed,
+      }
+    ).start(event => {
+      if (event.finished && this.state.gameOver == false) {
+        clearInterval(refreshIntervalId);
+        this.setState({ points: ++this.state.points });
+        this.animateEnemy();
+      }
+    })
+  }
+
+  gameOver() {
+    alert('Game Over !');
   }
 }
 
